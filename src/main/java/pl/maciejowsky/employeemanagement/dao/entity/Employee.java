@@ -1,10 +1,18 @@
-package pl.maciejowsky.employeemanagement;
+package pl.maciejowsky.employeemanagement.dao.entity;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Entity
 public class Employee {
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
     private Long id;
-     private String name;
-     private String surname;
-     private String email;
+    private String name;
+    private String surname;
+    private String email;
 
     public Employee() {
     }
