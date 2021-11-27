@@ -34,8 +34,8 @@ public class EmployeeManager {
     }
     @EventListener(ApplicationReadyEvent.class)
     public void fillDB() {
-        save(new Employee(1L, "Antek", "Nosalik", "nosek@gmail.com"));
-        save(new Employee(2L, "Franek", "Antkowiak", "franek@gmail.com"));
-        save(new Employee(3L, "Franekdsad", "Antkowiadsadsak", "franedsadsak@gmail.com"));
+        save(new Employee("nosek@gmail.com","Antek", "Nosalik" ));
+        save(new Employee( "franek@gmail.com","Franek", "Antkowiak" ));
+        save(new Employee( "franedsadsak@gmail.com","Franekdsad", "Antkowiadsadsak" ));
     }
 }

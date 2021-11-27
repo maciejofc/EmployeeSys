@@ -1,27 +1,47 @@
 package pl.maciejowsky.employeemanagement.dao.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
-@Entity
+@Entity(name = "Employee")
+@Table(
+        name = "employee"
+//        uniqueConstraints = {
+//                @UniqueConstraint(name = "student_email_unique", columnNames = "email")
+//        }
+)
 public class Employee {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
+    @Column(
+            name = "id",
+            updatable = false
+    )
     private Long id;
-    private String name;
-    private String surname;
+    @Column(
+            name = "email",
+            nullable = false
+    )
     private String email;
+    @Column(
+            name = "first_name",
+            nullable = false
+    )
+    private String name;
+    @Column(
+            name = "surname",
+            nullable = false
+    )
+    private String surname;
+
 
     public Employee() {
     }
 
-    public Employee(Long id, String name, String surname, String email) {
-        this.id = id;
+    public Employee(String email, String name, String surname) {
+        this.email = email;
         this.name = name;
         this.surname = surname;
-        this.email = email;
+
     }
 
     public Long getId() {
