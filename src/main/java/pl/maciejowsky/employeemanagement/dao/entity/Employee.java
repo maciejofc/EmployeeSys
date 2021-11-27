@@ -9,7 +9,7 @@ import java.time.LocalDate;
 
 @Entity(name = "Employee")
 @Table(
-        name = "employee",
+        name = "employees",
         uniqueConstraints = {
                 @UniqueConstraint(name = "student_email_unique", columnNames = "email")
         }
@@ -83,7 +83,10 @@ public class Employee {
     }
 
     public Employee(Date birthDate, String firstName, String lastName, String email, Gender gender, Integer salary) {
-        this.birthDate = birthDate;
+            int year = birthDate.getYear()-1900;
+            int month = birthDate.getMonth();
+            int second = birthDate.getDay();
+        this.birthDate =new Date(year,month,second);
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
