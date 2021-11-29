@@ -5,23 +5,27 @@ import pl.maciejowsky.employeemanagement.dao.Gender;
 import javax.persistence.*;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity(name = "Employee")
 @Table(
         name = "employees",
         uniqueConstraints = {
-                @UniqueConstraint(name = "student_email_unique", columnNames = "email")
+                @UniqueConstraint(name = "employee_email_unique", columnNames = "email")
         }
 )
 public class Employee {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(
-            name = "id",
+            name = "emp_no",
             updatable = false
     )
-    private Long id;
+    private long id;
+
+
     @Column(
             name = "birth_date",
             nullable = false
@@ -58,8 +62,24 @@ public class Employee {
             name = "salary",
             nullable = false
     )
-    private Integer salary;
+    private int salary;
+    //mapped by is value that we reference in title
+    // this is Employee  --->>>employee<<<----
+    //if we do not specify mappedBy we will have
+    // separate table employee_title
+    @OneToMany()
+    @JoinColumn(name = "emp_no_foreign_key", referencedColumnName = "emp_no")
+     List<Title> titles = new ArrayList<>();
 
+
+    public void setTitles(List<Title> titles) {
+        this.titles = titles;
+    }
+
+    public List<Title> getTitles() {
+
+        return titles;
+    }
 
     public Employee() {
     }
@@ -82,10 +102,10 @@ public class Employee {
         this.hireDate = hireDate;
     }
 
-    public Employee(Date birthDate, String firstName, String lastName, String email, Gender gender, Integer salary) {
-            int year = birthDate.getYear()-1900;
-            int month = birthDate.getMonth();
-            int second = birthDate.getDay();
+    public Employee(Date birthDate, String firstName, String lastName, String email, Gender gender, int salary) {
+        int year = birthDate.getYear()-1900;
+        int month = birthDate.getMonth();
+        int second = birthDate.getDay();
         this.birthDate =new Date(year,month,second);
         this.firstName = firstName;
         this.lastName = lastName;
@@ -95,15 +115,13 @@ public class Employee {
         this.hireDate = Date.valueOf(LocalDate.now());
     }
 
-    public Long getId() {
-
+    public long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
-
 
     public String getFirstName() {
 
@@ -140,13 +158,11 @@ public class Employee {
         this.gender = gender;
     }
 
-
-    public Integer getSalary() {
-
+    public int getSalary() {
         return salary;
     }
 
-    public void setSalary(Integer salary) {
+    public void setSalary(int salary) {
         this.salary = salary;
     }
 }

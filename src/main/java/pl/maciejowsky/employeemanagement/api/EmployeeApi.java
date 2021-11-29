@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.maciejowsky.employeemanagement.dao.entity.Employee;
 import pl.maciejowsky.employeemanagement.manager.EmployeeManager;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -32,8 +33,8 @@ public class EmployeeApi {
 //        return employeeManager.findAll();
 //    }
     @GetMapping("/all")
-    public ResponseEntity<Iterable<Employee>> getAll() {
-        Iterable<Employee> employees = employeeManager.findAll();
+    public ResponseEntity<List<Employee>>getAll() {
+        List<Employee> employees = (List<Employee>) employeeManager.findAll();
         HttpHeaders header = new HttpHeaders();
         header.add("Description", "List of all Employees");
         //one method by using static method from ResponseEntity
