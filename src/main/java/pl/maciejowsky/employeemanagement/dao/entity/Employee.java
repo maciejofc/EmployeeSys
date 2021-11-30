@@ -1,12 +1,15 @@
 package pl.maciejowsky.employeemanagement.dao.entity;
 
+import org.hibernate.annotations.BatchSize;
 import pl.maciejowsky.employeemanagement.dao.Gender;
 
 import javax.persistence.*;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 @Entity(name = "Employee")
@@ -67,18 +70,21 @@ public class Employee {
     // this is Employee  --->>>employee<<<----
     //if we do not specify mappedBy we will have
     // separate table employee_title
-    @OneToMany()
+    // -------DEFAULTS-------
+    //    OneToMany: LAZY
+//    ManyToOne: EAGER
+//    ManyToMany: LAZY
+//    OneToOne: EAGER
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "emp_no_foreign_key", referencedColumnName = "emp_no")
-     List<Title> titles = new ArrayList<>();
-
-
-    public void setTitles(List<Title> titles) {
-        this.titles = titles;
-    }
-
-    public List<Title> getTitles() {
+    private Set<Title> titles= new HashSet<>();
+    public Set<Title> getTitles() {
 
         return titles;
+    }
+
+    public void setTitles(Set<Title> titles) {
+        this.titles = titles;
     }
 
     public Employee() {

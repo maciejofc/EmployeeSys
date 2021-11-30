@@ -5,11 +5,7 @@ import java.util.Set;
 
 @Entity(name = "Title")
 @Table(
-        name = "titles",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "employee_title_unique", columnNames = "title_name")
-        }
-)
+        name = "titles")
 public class Title {
 
     @Id
@@ -23,6 +19,8 @@ public class Title {
             name = "title_name",
             nullable = false
     )
+
+
     private String title;
 
     public Title() {
@@ -34,8 +32,8 @@ public class Title {
     }
 
     public void setTitle(String title) {
-
         this.title = title;
+
     }
 
 

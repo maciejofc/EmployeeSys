@@ -29,8 +29,8 @@ public class TitleManager {
 
     @EventListener(ApplicationReadyEvent.class)
     public void addTitlesToEmployee() {
-        Employee employee = employeeRepository.findByEmail("nosek@gmail.com");
-        Employee employee1 = employeeRepository.findByEmail("nosek12@gmail.com");
+//        Employee employee = employeeRepository.findByEmail("nosek@gmail.com");
+//        Employee employee1 = employeeRepository.findByEmail("nosek12@gmail.com");
 
 
 

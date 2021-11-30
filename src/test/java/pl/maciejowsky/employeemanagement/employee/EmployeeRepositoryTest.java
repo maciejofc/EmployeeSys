@@ -27,7 +27,7 @@ class EmployeeRepositoryTest {
         Employee exemplaryEmployee = new Employee(new Date(1900,12,11), "Antek", "Nosalik",exemplaryEmail, Gender.MALE,3000);
         underTest.save(exemplaryEmployee);
         //when
-        Employee result = underTest.findByEmail(exemplaryEmail);
+        Employee result = underTest.findEmployeeAndInfoByEmail(exemplaryEmail);
 
         //then
         assertThat(result.getEmail()).isEqualTo("franczesko997@gmail.com");

@@ -16,8 +16,9 @@ public interface EmployeeRepository extends CrudRepository<Employee, Long> {
 
     //JPQL ?1 is first parameter in method
     // Employee is name from @Entity annotation
-    @Query("SELECT e FROM Employee e WHERE e.email = ?1")
-    public Employee findByEmail(String email);
+    @Query("SELECT e FROM Employee e left join" +
+            " fetch e.titles WHERE e.email = ?1")
+    public Employee findEmployeeAndInfoByEmail(String email);
 
 //    // native query for inserting and updatuing
 //    @Modifying
@@ -28,4 +29,11 @@ public interface EmployeeRepository extends CrudRepository<Employee, Long> {
 //    )
 //    int updateEmployeeNameByEmailId(String firstName,String emailId);
 
+    @Query("Select DISTINCT e From Employee e" +
+    " left join fetch e.titles")
+    List<Employee> findAllEmployeesWithInfo();
+
+    @Query("SELECT e FROM Employee e left join" +
+            " fetch e.titles WHERE e.id = ?1")
+    Employee findEmployeeAndInfoById(long id);
 }

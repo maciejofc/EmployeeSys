@@ -9,7 +9,6 @@ import pl.maciejowsky.employeemanagement.dao.entity.Employee;
 import pl.maciejowsky.employeemanagement.manager.EmployeeManager;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 //Every method returns a domain object instead of a view
@@ -27,13 +26,9 @@ public class EmployeeApi {
         this.employeeManager = employeeManager;
     }
 
-    //
-//    @GetMapping("/all")
-//    public Iterable<Employee> getAll() {
-//        return employeeManager.findAll();
-//    }
+
     @GetMapping("/all")
-    public ResponseEntity<List<Employee>>getAll() {
+    public ResponseEntity<List<Employee>> getAll() {
         List<Employee> employees = (List<Employee>) employeeManager.findAll();
         HttpHeaders header = new HttpHeaders();
         header.add("Description", "List of all Employees");
@@ -42,15 +37,25 @@ public class EmployeeApi {
 
     }
 
-    @GetMapping
-    public ResponseEntity<Optional<Employee>> getById(@RequestParam int index) {
-        Optional<Employee> employee = employeeManager.findById((long) index);
-
+    @GetMapping()
+    public ResponseEntity<Employee> getByEmail(@RequestParam String email) {
+        Employee employee = employeeManager.findByEmail(email);
+        System.out.println(employee);
         HttpHeaders header = new HttpHeaders();
         header.add("Description", "Result of single employee");
         //second method by using new ResponseEntity
-        return new ResponseEntity<Optional<Employee>>(employee, header, HttpStatus.OK);
-
+        //return new ResponseEntity<Employee>(employee, header, HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).headers(header).body(employee);
+    }
+    @GetMapping("/{id}")
+    public ResponseEntity<Employee> getById(@PathVariable long id) {
+        Employee employee = employeeManager.findById(id);
+        System.out.println(employee);
+        HttpHeaders header = new HttpHeaders();
+        header.add("Description", "Result of single employee");
+        //second method by using new ResponseEntity
+        //return new ResponseEntity<Employee>(employee, header, HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).headers(header).body(employee);
     }
 
     @PostMapping
@@ -59,7 +64,7 @@ public class EmployeeApi {
     public ResponseEntity<Void> addEmployee(@RequestBody Employee employee) {
         employeeManager.save(employee);
         HttpHeaders header = new HttpHeaders();
-        header.add("Description","Adding one book");
+        header.add("Description", "Adding one book");
         return ResponseEntity.status(HttpStatus.OK).headers(header).build();
         // or without header and body
         // return ResponseEntity.ok().build();
@@ -71,8 +76,7 @@ public class EmployeeApi {
     //overriding elements - updating
     public ResponseEntity<Void> updateEmployee(@RequestBody Employee employee) {
         employeeManager.save(employee);
-         return ResponseEntity.ok().build();
-
+        return ResponseEntity.ok().build();
 
 
     }
