@@ -1,5 +1,6 @@
 package pl.maciejowsky.employeemanagement.dao.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.BatchSize;
 import pl.maciejowsky.employeemanagement.dao.Gender;
 
@@ -75,8 +76,16 @@ public class Employee {
 //    ManyToOne: EAGER
 //    ManyToMany: LAZY
 //    OneToOne: EAGER
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "emp_no_foreign_key", referencedColumnName = "emp_no")
+    //orphan removal(ORM concept) make a DELETE statement to child when
+    //there is no longer association
+
+    //CascadeType.Remove(db concept) if parent is removed all related records in child
+    //table should be removed
+    @OneToMany(cascade = CascadeType.ALL,orphanRemoval = false)
+    //updatable true and insertable
+    // by default makes we can pass titles into request body
+    //when we insert or update
+    @JoinColumn(name = "emp_no_foreign_key", referencedColumnName = "emp_no",insertable = true,updatable = true)
     private Set<Title> titles= new HashSet<>();
     public Set<Title> getTitles() {
 

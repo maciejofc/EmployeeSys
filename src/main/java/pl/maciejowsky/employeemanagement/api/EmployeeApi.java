@@ -28,7 +28,7 @@ public class EmployeeApi {
 
 
     @GetMapping("/all")
-    public ResponseEntity<List<Employee>> getAll() {
+    public ResponseEntity<List<Employee>> getAllEmployees() {
         List<Employee> employees = (List<Employee>) employeeManager.findAll();
         HttpHeaders header = new HttpHeaders();
         header.add("Description", "List of all Employees");
@@ -38,7 +38,7 @@ public class EmployeeApi {
     }
 
     @GetMapping()
-    public ResponseEntity<Employee> getByEmail(@RequestParam String email) {
+    public ResponseEntity<Employee> getEmployeeByEmail(@RequestParam(required = true) String email) {
         Employee employee = employeeManager.findByEmail(email);
         System.out.println(employee);
         HttpHeaders header = new HttpHeaders();
@@ -47,8 +47,9 @@ public class EmployeeApi {
         //return new ResponseEntity<Employee>(employee, header, HttpStatus.OK);
         return ResponseEntity.status(HttpStatus.OK).headers(header).body(employee);
     }
+
     @GetMapping("/{id}")
-    public ResponseEntity<Employee> getById(@PathVariable long id) {
+    public ResponseEntity<Employee> getEmployeeById(@PathVariable(required = true) long id) {
         Employee employee = employeeManager.findById(id);
         System.out.println(employee);
         HttpHeaders header = new HttpHeaders();
@@ -62,7 +63,7 @@ public class EmployeeApi {
     //post adding elements
     //request body maps the HttpRequestBody to domain object, JSON -> Java type
     public ResponseEntity<Void> addEmployee(@RequestBody Employee employee) {
-        employeeManager.save(employee);
+        employeeManager.saveEmployee(employee);
         HttpHeaders header = new HttpHeaders();
         header.add("Description", "Adding one book");
         return ResponseEntity.status(HttpStatus.OK).headers(header).build();
@@ -74,16 +75,20 @@ public class EmployeeApi {
     @PutMapping
     //PatchMapping only updating one field
     //overriding elements - updating
-    public ResponseEntity<Void> updateEmployee(@RequestBody Employee employee) {
-        employeeManager.save(employee);
-        return ResponseEntity.ok().build();
+    //update only first,last namem titles, email, salary
+    public ResponseEntity<Employee> updateEmployee(@RequestBody Employee employee) {
+
+        Employee employeeEdited = employeeManager.editEmployee(employee);
+        HttpHeaders header = new HttpHeaders();
+        header.add("Description", "Updating employee");
+        return ResponseEntity.status(HttpStatus.OK).headers(header).body(employeeEdited);
 
 
     }
 
-    @DeleteMapping
-    public ResponseEntity<Void> deleteEmployee(@RequestParam int index) {
-        employeeManager.deleteById((long) index);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteEmployee(@PathVariable long id) {
+        employeeManager.deleteById(id);
         return ResponseEntity.ok().build();
 
     }
