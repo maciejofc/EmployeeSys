@@ -27,7 +27,7 @@ public class Employee {
             name = "emp_no",
             updatable = false
     )
-    private long id;
+    private Long id;
 
 
     @Column(
@@ -92,8 +92,9 @@ public class Employee {
         return titles;
     }
 
+
     public void setTitles(Set<Title> titles) {
-        this.titles = titles;
+        this.titles=titles;
     }
 
     public Employee() {
@@ -117,24 +118,13 @@ public class Employee {
         this.hireDate = hireDate;
     }
 
-    public Employee(Date birthDate, String firstName, String lastName, String email, Gender gender, int salary) {
-        int year = birthDate.getYear()-1900;
-        int month = birthDate.getMonth();
-        int second = birthDate.getDay();
-        this.birthDate =new Date(year,month,second);
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.gender = gender;
-        this.salary = salary;
-        this.hireDate = Date.valueOf(LocalDate.now());
-    }
 
-    public long getId() {
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -179,5 +169,17 @@ public class Employee {
 
     public void setSalary(int salary) {
         this.salary = salary;
+    }
+    public Employee(Date birthDate, String firstName, String lastName, String email, Gender gender, int salary) {
+        int year = birthDate.getYear()-1900;
+        int month = birthDate.getMonth();
+        int second = birthDate.getDay();
+        this.birthDate =new Date(year,month,second);
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.gender = gender;
+        this.salary = salary;
+        this.hireDate = Date.valueOf(LocalDate.now());
     }
 }

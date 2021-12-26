@@ -49,7 +49,7 @@ public class EmployeeApi {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Employee> getEmployeeById(@PathVariable(required = true) long id) {
+    public ResponseEntity<Employee> getEmployeeById(@PathVariable(required = true) Long id) {
         Employee employee = employeeManager.findById(id);
         System.out.println(employee);
         HttpHeaders header = new HttpHeaders();
@@ -87,7 +87,7 @@ public class EmployeeApi {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEmployee(@PathVariable long id) {
+    public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
         employeeManager.deleteById(id);
         return ResponseEntity.ok().build();
 

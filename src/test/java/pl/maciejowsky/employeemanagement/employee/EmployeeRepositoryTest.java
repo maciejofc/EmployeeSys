@@ -63,7 +63,7 @@ class EmployeeRepositoryTest {
         //id 2 not 1 because identity strategy makes that
         // wheter we delete records strategy look at last added Id and return
         //new id = previous id +1
-        Employee result = underTest.findEmployeeAndInfoById(2);
+        Employee result = underTest.findEmployeeAndInfoById(2L);
 
         //then
 
@@ -75,7 +75,7 @@ class EmployeeRepositoryTest {
         long id =1;
 
         //when
-        Employee result = underTest.findEmployeeAndInfoById(1);
+        Employee result = underTest.findEmployeeAndInfoById(1L);
 
         //then
 

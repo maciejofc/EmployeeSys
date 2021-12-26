@@ -56,9 +56,9 @@ class EmployeeManagerTest {
 
     void findById() {
         //when
-        underTest.findById(1);
+        underTest.findById(1L);
 
         //then
-        verify(employeeRepository).findEmployeeAndInfoById(1);
+        verify(employeeRepository).findEmployeeAndInfoById(1L);
     }
 }

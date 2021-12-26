@@ -29,11 +29,13 @@ public interface EmployeeRepository extends CrudRepository<Employee, Long> {
 //    )
 //    int updateEmployeeNameByEmailId(String firstName,String emailId);
 
-    @Query("Select DISTINCT e From Employee e" +
-    " left join fetch e.titles")
+//    @Query("Select DISTINCT e From Employee e" +
+//    " left join fetch e.titles")
+    @Query("select e, t.title From Employee e " +
+            "left join fetch e.titles t")
     List<Employee> findAllEmployeesWithInfo();
 
     @Query("SELECT e FROM Employee e left join" +
             " fetch e.titles WHERE e.id = ?1")
-    Employee findEmployeeAndInfoById(long id);
+    Employee findEmployeeAndInfoById(Long id);
 }

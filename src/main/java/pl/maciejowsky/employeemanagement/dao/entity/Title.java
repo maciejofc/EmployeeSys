@@ -1,7 +1,6 @@
 package pl.maciejowsky.employeemanagement.dao.entity;
 
 import javax.persistence.*;
-import java.util.Set;
 
 @Entity(name = "Title")
 @Table(
@@ -19,11 +18,21 @@ public class Title {
             name = "title_name",
             nullable = false
     )
-
-
     private String title;
 
     public Title() {
+    }
+
+    public Title(String title) {
+        this.title = title;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getTitle() {
@@ -37,8 +46,4 @@ public class Title {
     }
 
 
-
-    public Title(String title) {
-        this.title = title;
-    }
 }
