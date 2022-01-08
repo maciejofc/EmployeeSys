@@ -10,12 +10,12 @@ public class Title {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(
-            name = "title_id"
+            name = "title_no"
     )
     private Long id;
 
     @Column(
-            name = "title_name",
+            name = "name",
             nullable = false
     )
     private String title;

@@ -1,7 +1,6 @@
 package pl.maciejowsky.employeemanagement.dao.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.hibernate.annotations.BatchSize;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import pl.maciejowsky.employeemanagement.dao.Gender;
 
 import javax.persistence.*;
@@ -81,23 +80,25 @@ public class Employee {
 
     //CascadeType.Remove(db concept) if parent is removed all related records in child
     //table should be removed
-    @OneToMany(cascade = CascadeType.ALL,orphanRemoval = false)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = false)
     //updatable true and insertable
     // by default makes we can pass titles into request body
     //when we insert or update
-    @JoinColumn(name = "emp_no_foreign_key", referencedColumnName = "emp_no",insertable = true,updatable = true)
-    private Set<Title> titles= new HashSet<>();
-    public Set<Title> getTitles() {
+    @JoinColumn(name = "emp_no_foreign_key", referencedColumnName = "emp_no", insertable = true, updatable = true)
+    private Set<Title> titles = new HashSet<>();
+    //
+    @JsonBackReference
+    @ManyToMany()
+    @JoinTable(
+            joinColumns = {@JoinColumn(name = "emp_no")},
+            inverseJoinColumns = {@JoinColumn(name = "dept_no")}
+    )
 
-        return titles;
-    }
+    List<Department> departments = new ArrayList<>();
 
-
-    public void setTitles(Set<Title> titles) {
-        this.titles=titles;
-    }
-
-    public Employee() {
+    public void addDepartment(Department department) {
+        departments.add(department);
+        department.getEmployees().add(this);
     }
 
     public Date getBirthDate() {
@@ -117,7 +118,6 @@ public class Employee {
     public void setHireDate(Date hireDate) {
         this.hireDate = hireDate;
     }
-
 
 
     public Long getId() {
@@ -170,11 +170,33 @@ public class Employee {
     public void setSalary(int salary) {
         this.salary = salary;
     }
+
+    public Set<Title> getTitles() {
+
+        return titles;
+    }
+
+
+    public void setTitles(Set<Title> titles) {
+        this.titles = titles;
+    }
+
+    public List<Department> getDepartments() {
+        return departments;
+    }
+
+    public void setDepartments(List<Department> departments) {
+        this.departments = departments;
+    }
+
+    public Employee() {
+    }
+
     public Employee(Date birthDate, String firstName, String lastName, String email, Gender gender, int salary) {
-        int year = birthDate.getYear()-1900;
+        int year = birthDate.getYear() - 1900;
         int month = birthDate.getMonth();
         int second = birthDate.getDay();
-        this.birthDate =new Date(year,month,second);
+        this.birthDate = new Date(year, month, second);
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -182,4 +204,5 @@ public class Employee {
         this.salary = salary;
         this.hireDate = Date.valueOf(LocalDate.now());
     }
+
 }

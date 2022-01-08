@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.maciejowsky.employeemanagement.dao.EmployeeRepository;
 import pl.maciejowsky.employeemanagement.dao.Gender;
+import pl.maciejowsky.employeemanagement.dao.entity.Department;
 import pl.maciejowsky.employeemanagement.dao.entity.Employee;
 import pl.maciejowsky.employeemanagement.dao.entity.Title;
 
@@ -86,7 +87,15 @@ public class EmployeeManager {
         employee3.getTitles().add(new Title("A ONE"));
         entityManager.persist(employee3);
         entityManager.persist(employee4);
+        Department department =new Department("Department 1");
+        Department department2 =new Department("Department 2");
+        Department department3 =new Department("Department 3");
 
-
+        employee1.addDepartment(department);
+        employee2.addDepartment(department2);
+        employee2.addDepartment(department3);
+        entityManager.persist(department);
+        entityManager.persist(department2);
+        entityManager.persist(department3);
     }
 }
