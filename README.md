@@ -2,4 +2,5 @@
 Employee Management
 
 ## db schema
-![employee_db_schema](https://user-images.githubusercontent.com/66476091/143690210-b401a131-d6b6-420a-b541-a8ff0624b2da.png)
+![EmployeeManagementSys_schema (2)](https://user-images.githubusercontent.com/66476091/148653354-7e7236a9-1812-4fd1-b64e-d0fdca7a2cbe.png)
+
