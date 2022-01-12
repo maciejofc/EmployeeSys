@@ -23,6 +23,7 @@ public class Department {
     @ManyToMany(mappedBy = "departments")
     private List<Employee> employees = new ArrayList<>();
 
+    private String location;
     public Department() {
     }
 
@@ -54,8 +55,16 @@ public class Department {
         this.employees = employees;
     }
 
-    public Department(Long id, String name) {
-        this.id = id;
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public Department(String name, String location) {
         this.name = name;
+        this.location=location;
     }
 }

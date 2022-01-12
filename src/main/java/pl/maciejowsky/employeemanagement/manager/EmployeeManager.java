@@ -45,7 +45,7 @@ public class EmployeeManager {
     //dirty checking - hibernate checks if the entity is updated
     //and auto save to db
     public Employee editEmployee(Employee employee) {
-        Employee employeeEdited = employeeRepository.findById(employee.getId()).orElseThrow();
+        Employee employeeEdited = employeeRepository.findEmployeeAndInfoById(employee.getId());
         employeeEdited.setFirstName(employee.getFirstName());
         employeeEdited.setLastName(employee.getLastName());
         employeeEdited.setTitles(employee.getTitles());
@@ -67,6 +67,17 @@ public class EmployeeManager {
         employeeRepository.deleteById(id);
     }
 
+
+
+
+
+
+    public List<Employee> getAllEmployeesWithInfo(){
+    return employeeRepository.findAllEmployeesWithInfo();
+    }
+
+
+
     @Transactional
     @EventListener(ApplicationReadyEvent.class)
     public void fillDB() {
@@ -87,13 +98,16 @@ public class EmployeeManager {
         employee3.getTitles().add(new Title("A ONE"));
         entityManager.persist(employee3);
         entityManager.persist(employee4);
-        Department department =new Department("Department 1");
-        Department department2 =new Department("Department 2");
-        Department department3 =new Department("Department 3");
+        Department department =new Department("Department 1","Gdynia");
+        Department department2 =new Department("Department 2","Warszawa");
+        Department department3 =new Department("Department 3","Sopot");
 
-        employee1.addDepartment(department);
+
         employee2.addDepartment(department2);
         employee2.addDepartment(department3);
+        employee1.addDepartment(department);
+        employee4.addDepartment(department);
+        employee3.addDepartment(department2);
         entityManager.persist(department);
         entityManager.persist(department2);
         entityManager.persist(department3);

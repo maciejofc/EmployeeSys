@@ -6,9 +6,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.maciejowsky.employeemanagement.dao.entity.Employee;
+import pl.maciejowsky.employeemanagement.dto.EmployeeDTO;
+import pl.maciejowsky.employeemanagement.dto.EmployeeWithDetailsDTO;
+
+import pl.maciejowsky.employeemanagement.dto.EmployeeWithDetailsMapper;
 import pl.maciejowsky.employeemanagement.manager.EmployeeManager;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 //Every method returns a domain object instead of a view
@@ -21,42 +26,49 @@ public class EmployeeApi {
 
     private EmployeeManager employeeManager;
 
-    @Autowired
-    public EmployeeApi(EmployeeManager employeeManager) {
+    private EmployeeWithDetailsMapper mapper;
+
+    public EmployeeApi(EmployeeManager employeeManager, EmployeeWithDetailsMapper mapper) {
         this.employeeManager = employeeManager;
+        this.mapper = mapper;
     }
+
+    @Autowired
+
 
 
     @GetMapping("/all")
-    public ResponseEntity<List<Employee>> getAllEmployees() {
-        List<Employee> employees = (List<Employee>) employeeManager.findAll();
+    public ResponseEntity<List<EmployeeWithDetailsDTO>> getAllEmployees() {
+        List<Employee> employees= employeeManager.getAllEmployeesWithInfo();
+        List<EmployeeWithDetailsDTO> employeeWithDetailsDTOS = employees.stream().map(e -> mapper.toDto(e)).collect(Collectors.toList());
         HttpHeaders header = new HttpHeaders();
         header.add("Description", "List of all Employees");
         //one method by using static method from ResponseEntity
-        return ResponseEntity.status(HttpStatus.OK).headers(header).body(employees);
+        return ResponseEntity.status(HttpStatus.OK).headers(header).body(employeeWithDetailsDTOS);
 
     }
 
     @GetMapping()
-    public ResponseEntity<Employee> getEmployeeByEmail(@RequestParam(required = true) String email) {
+    public ResponseEntity<EmployeeWithDetailsDTO> getEmployeeByEmail(@RequestParam(required = true) String email) {
         Employee employee = employeeManager.findByEmail(email);
         System.out.println(employee);
+        EmployeeWithDetailsDTO employeeWithDetailsDTO = mapper.toDto(employee);
         HttpHeaders header = new HttpHeaders();
         header.add("Description", "Result of single employee");
         //second method by using new ResponseEntity
         //return new ResponseEntity<Employee>(employee, header, HttpStatus.OK);
-        return ResponseEntity.status(HttpStatus.OK).headers(header).body(employee);
+        return ResponseEntity.status(HttpStatus.OK).headers(header).body(employeeWithDetailsDTO);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Employee> getEmployeeById(@PathVariable(required = true) Long id) {
+    public ResponseEntity<EmployeeWithDetailsDTO> getEmployeeById(@PathVariable(required = true) Long id) {
         Employee employee = employeeManager.findById(id);
-        System.out.println(employee);
+        EmployeeWithDetailsDTO employeeWithDetailsDTO = mapper.toDto(employee);
         HttpHeaders header = new HttpHeaders();
         header.add("Description", "Result of single employee");
         //second method by using new ResponseEntity
         //return new ResponseEntity<Employee>(employee, header, HttpStatus.OK);
-        return ResponseEntity.status(HttpStatus.OK).headers(header).body(employee);
+        return ResponseEntity.status(HttpStatus.OK).headers(header).body(employeeWithDetailsDTO);
     }
 
     @PostMapping
