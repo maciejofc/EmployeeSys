@@ -87,7 +87,7 @@ public class Employee {
     @JoinColumn(name = "emp_no_foreign_key", referencedColumnName = "emp_no", insertable = true, updatable = true)
     private Set<Title> titles = new HashSet<>();
     //
-    @JsonBackReference
+
     @ManyToMany()
     @JoinTable(
             joinColumns = {@JoinColumn(name = "emp_no")},
@@ -190,6 +190,7 @@ public class Employee {
     }
 
     public Employee() {
+        this.hireDate = Date.valueOf(LocalDate.now());
     }
 
     public Employee(Date birthDate, String firstName, String lastName, String email, Gender gender, int salary) {

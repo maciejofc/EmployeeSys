@@ -6,10 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.maciejowsky.employeemanagement.dao.entity.Employee;
-import pl.maciejowsky.employeemanagement.dto.EmployeeDTO;
-import pl.maciejowsky.employeemanagement.dto.EmployeeWithDetailsDTO;
-
-import pl.maciejowsky.employeemanagement.dto.EmployeeWithDetailsMapper;
+import pl.maciejowsky.employeemanagement.dao.entity.Title;
+import pl.maciejowsky.employeemanagement.dto.*;
 import pl.maciejowsky.employeemanagement.manager.EmployeeManager;
 
 import java.util.List;
@@ -25,22 +23,24 @@ import java.util.stream.Collectors;
 public class EmployeeApi {
 
     private EmployeeManager employeeManager;
-
-    private EmployeeWithDetailsMapper mapper;
-
-    public EmployeeApi(EmployeeManager employeeManager, EmployeeWithDetailsMapper mapper) {
-        this.employeeManager = employeeManager;
-        this.mapper = mapper;
-    }
+    private TitleMapper titleMapper;
+    private EmployeeWithDetailsMapper mapperWithDetails;
+    private EmployeeMapper mapper;
 
     @Autowired
-
+    public EmployeeApi(EmployeeManager employeeManager, EmployeeWithDetailsMapper mapperWithDetails, EmployeeMapper mapper, TitleMapper titleMapper) {
+        this.employeeManager = employeeManager;
+        this.mapperWithDetails = mapperWithDetails;
+        this.mapper = mapper;
+        this.titleMapper = titleMapper;
+    }
 
 
     @GetMapping("/all")
     public ResponseEntity<List<EmployeeWithDetailsDTO>> getAllEmployees() {
-        List<Employee> employees= employeeManager.getAllEmployeesWithInfo();
-        List<EmployeeWithDetailsDTO> employeeWithDetailsDTOS = employees.stream().map(e -> mapper.toDto(e)).collect(Collectors.toList());
+        int pageNumber = page >= 0 ? page : 0;
+        List<Employee> employees = employeeManager.findAllEmployeesWithInfo();
+        List<EmployeeWithDetailsDTO> employeeWithDetailsDTOS = employees.stream().map(e -> mapperWithDetails.toDto(e)).collect(Collectors.toList());
         HttpHeaders header = new HttpHeaders();
         header.add("Description", "List of all Employees");
         //one method by using static method from ResponseEntity
@@ -50,9 +50,9 @@ public class EmployeeApi {
 
     @GetMapping()
     public ResponseEntity<EmployeeWithDetailsDTO> getEmployeeByEmail(@RequestParam(required = true) String email) {
-        Employee employee = employeeManager.findByEmail(email);
+        Employee employee = employeeManager.findEmployeeAndInfoByEmail(email);
         System.out.println(employee);
-        EmployeeWithDetailsDTO employeeWithDetailsDTO = mapper.toDto(employee);
+        EmployeeWithDetailsDTO employeeWithDetailsDTO = mapperWithDetails.toDto(employee);
         HttpHeaders header = new HttpHeaders();
         header.add("Description", "Result of single employee");
         //second method by using new ResponseEntity
@@ -62,8 +62,8 @@ public class EmployeeApi {
 
     @GetMapping("/{id}")
     public ResponseEntity<EmployeeWithDetailsDTO> getEmployeeById(@PathVariable(required = true) Long id) {
-        Employee employee = employeeManager.findById(id);
-        EmployeeWithDetailsDTO employeeWithDetailsDTO = mapper.toDto(employee);
+        Employee employee = employeeManager.findEmployeeAndInfoById(id);
+        EmployeeWithDetailsDTO employeeWithDetailsDTO = mapperWithDetails.toDto(employee);
         HttpHeaders header = new HttpHeaders();
         header.add("Description", "Result of single employee");
         //second method by using new ResponseEntity
@@ -74,28 +74,43 @@ public class EmployeeApi {
     @PostMapping
     //post adding elements
     //request body maps the HttpRequestBody to domain object, JSON -> Java type
-    public ResponseEntity<Void> addEmployee(@RequestBody Employee employee) {
+    public ResponseEntity<Void> addEmployee(@RequestBody EmployeeDTO employeeDTO) {
+//        Employee employee = new Employee();
+        Employee employee = mapper.toModel(employeeDTO);
         employeeManager.saveEmployee(employee);
         HttpHeaders header = new HttpHeaders();
-        header.add("Description", "Adding one book");
+        header.add("Description", "Adding one employee");
         return ResponseEntity.status(HttpStatus.OK).headers(header).build();
         // or without header and body
         // return ResponseEntity.ok().build();
-
     }
 
-    @PutMapping
-    //PatchMapping only updating one field
-    //overriding elements - updating
-    //update only first,last namem titles, email, salary
-    public ResponseEntity<Employee> updateEmployee(@RequestBody Employee employee) {
 
-        Employee employeeEdited = employeeManager.editEmployee(employee);
+    @PostMapping("/{id}/titles")
+    public ResponseEntity<Void> addTitle(@RequestBody TitleDTO titleDTO, @PathVariable Long id) {
+        Title title = titleMapper.toModel(titleDTO);
+        employeeManager.addTitle(title, id);
+        HttpHeaders header = new HttpHeaders();
+        header.add("Description", "Adding title to employee");
+        return ResponseEntity.status(HttpStatus.OK).headers(header).build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<EmployeeDTO> updateEmployee(@RequestBody EmployeeDTO employeeDTO, Long id) {
+        Employee employeeEdited = mapper.toModel(employeeDTO);
+        employeeManager.editEmployee(employeeEdited, id);
         HttpHeaders header = new HttpHeaders();
         header.add("Description", "Updating employee");
-        return ResponseEntity.status(HttpStatus.OK).headers(header).body(employeeEdited);
+        return ResponseEntity.status(HttpStatus.OK).headers(header).body(employeeDTO);
+    }
 
 
+    @DeleteMapping("/{id}/titles")
+    public ResponseEntity<Void> deleteTitle(@PathVariable Long id, @RequestParam Long titleId) {
+        employeeManager.deleteTitle(titleId);
+        HttpHeaders header = new HttpHeaders();
+        header.add("Description", "Delete title from employee");
+        return ResponseEntity.status(HttpStatus.OK).headers(header).build();
     }
 
     @DeleteMapping("/{id}")

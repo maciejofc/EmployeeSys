@@ -54,6 +54,7 @@ public interface EmployeeWithDetailsMapper {
                 .age(calculateAge(employee.getBirthDate().getYear() + 1900))
                 .gender(employee.getGender())
                 .salary(employee.getSalary())
+                .email(employee.getEmail())
                 .departmentsDtoList(departmentToDto(employee.getDepartments()))
                 .titlesDtoSet(titleToDto(employee.getTitles()))
                 .build();

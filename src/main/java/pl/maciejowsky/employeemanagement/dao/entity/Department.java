@@ -19,7 +19,7 @@ public class Department {
 
     private String name;
     //
-    @JsonManagedReference
+
     @ManyToMany(mappedBy = "departments")
     private List<Employee> employees = new ArrayList<>();
 
@@ -67,4 +67,5 @@ public class Department {
         this.name = name;
         this.location=location;
     }
+
 }

@@ -7,4 +7,5 @@ import pl.maciejowsky.employeemanagement.dao.entity.Department;
 public interface DepartmentMapper {
 
     DepartmentDTO toDto(Department department);
+    Department toModel(DepartmentDTO departmentDTO);
 }

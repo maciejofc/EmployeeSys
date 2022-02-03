@@ -3,6 +3,7 @@ package pl.maciejowsky.employeemanagement.manager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.maciejowsky.employeemanagement.dao.EmployeeRepository;
@@ -10,6 +11,8 @@ import pl.maciejowsky.employeemanagement.dao.Gender;
 import pl.maciejowsky.employeemanagement.dao.entity.Department;
 import pl.maciejowsky.employeemanagement.dao.entity.Employee;
 import pl.maciejowsky.employeemanagement.dao.entity.Title;
+import pl.maciejowsky.employeemanagement.dao.exception.ResourceAlreadyExistsException;
+import pl.maciejowsky.employeemanagement.dao.exception.ResourceNotFoundException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -20,10 +23,11 @@ import java.util.List;
 public class EmployeeManager {
 
 
+
     @PersistenceContext
     private EntityManager entityManager;
 
-    //    @Autowired
+
     private EmployeeRepository employeeRepository;
 
     @Autowired
@@ -32,35 +36,58 @@ public class EmployeeManager {
     }
 
 
-    public Employee findByEmail(String email) {
-        return employeeRepository.findEmployeeAndInfoByEmail(email);
+    public List<Employee> findAllEmployeesWithInfo() {
+        return employeeRepository.findAllEmployeesWithInfo();
     }
 
-    public Employee findById(Long id) {
-        return employeeRepository.findEmployeeAndInfoById(id);
+    public Employee findEmployeeAndInfoByEmail(String email) {
+        return employeeRepository.findEmployeeAndInfoByEmail(email).orElseThrow(() ->
+                new ResourceNotFoundException("There is no member associated with this email:" + email));
     }
 
-    //we make 2 transaction em
-    @Transactional
-    //dirty checking - hibernate checks if the entity is updated
-    //and auto save to db
-    public Employee editEmployee(Employee employee) {
-        Employee employeeEdited = employeeRepository.findEmployeeAndInfoById(employee.getId());
-        employeeEdited.setFirstName(employee.getFirstName());
-        employeeEdited.setLastName(employee.getLastName());
-        employeeEdited.setTitles(employee.getTitles());
-        employeeEdited.setEmail(employee.getEmail());
-        employeeEdited.setSalary(employee.getSalary());
-        //dirty checking - we can just do - return employeeEdited
-        return employeeRepository.save(employeeEdited);
+    public Employee findEmployeeAndInfoById(Long id) {
+        return employeeRepository.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("There is no member associated with this id: " + id));
     }
 
     public Employee saveEmployee(Employee employee) {
-        return employeeRepository.save(employee);
+        String email = employee.getEmail();
+        boolean ifEmailExists = employeeRepository.findEmployeeAndInfoByEmail(email).isPresent();
+        if (!ifEmailExists) {
+            return employeeRepository.save(employee);
+        } else
+            throw new ResourceAlreadyExistsException("This email:" + email + " is already associated with some member, please try another email");
+
     }
 
-    public List<Employee> findAll() {
-        return employeeRepository.findAllEmployeesWithInfo();
+    @Transactional
+    public Employee editEmployee(Employee employee, Long id) {
+        String newEmail = employee.getEmail();
+        boolean isInDBAlreadyExactEmail = employeeRepository.findEmployeeAndInfoByEmail(newEmail).isPresent();
+        if (isInDBAlreadyExactEmail)
+            throw new ResourceAlreadyExistsException("You can not change your e-mail to this: " + newEmail + " because it is occupied");
+        Employee employeeFromDB = findEmployeeAndInfoById(id);
+        if (employee.getFirstName() != null) {
+            employeeFromDB.setFirstName(employee.getFirstName());
+        }
+        if (employee.getLastName() != null) {
+            employeeFromDB.setLastName(employee.getLastName());
+        }
+        if (employee.getEmail() != null) {
+
+            employeeFromDB.setEmail(employee.getEmail());
+
+        }
+
+        if (Integer.valueOf(employee.getSalary()) != null) {
+            employeeFromDB.setSalary(employee.getSalary());
+        }
+
+        if (employee.getGender() != null) {
+            employeeFromDB.setGender(employee.getGender());
+        }
+
+        return employeeFromDB;
     }
 
     public void deleteById(Long id) {
@@ -68,14 +95,24 @@ public class EmployeeManager {
     }
 
 
+    @Transactional
+    public void addTitle(Title title, Long empNo) {
+        Employee employee = findEmployeeAndInfoById(empNo);
+        for (Title iteratingTitle : employee.getTitles()) {
+            String nameOfAlreadyExistingTitle = iteratingTitle.getTitle();
+            if (nameOfAlreadyExistingTitle.equals(title.getTitle())) {
+                throw new ResourceAlreadyExistsException("This title: " + nameOfAlreadyExistingTitle + " is already assigned to member");
+            }
+        }
 
-
-
-
-    public List<Employee> getAllEmployeesWithInfo(){
-    return employeeRepository.findAllEmployeesWithInfo();
+        employee.getTitles().add(title);
     }
 
+
+    @Transactional
+    public void deleteTitle(Long id) {
+        employeeRepository.deleteTitle(id);
+    }
 
 
     @Transactional
@@ -98,9 +135,9 @@ public class EmployeeManager {
         employee3.getTitles().add(new Title("A ONE"));
         entityManager.persist(employee3);
         entityManager.persist(employee4);
-        Department department =new Department("Department 1","Gdynia");
-        Department department2 =new Department("Department 2","Warszawa");
-        Department department3 =new Department("Department 3","Sopot");
+        Department department = new Department("Department 1", "Gdynia");
+        Department department2 = new Department("Department 2", "Warszawa");
+        Department department3 = new Department("Department 3", "Sopot");
 
 
         employee2.addDepartment(department2);

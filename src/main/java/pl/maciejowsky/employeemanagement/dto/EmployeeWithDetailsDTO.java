@@ -1,7 +1,6 @@
 package pl.maciejowsky.employeemanagement.dto;
 
 import pl.maciejowsky.employeemanagement.dao.Gender;
-import pl.maciejowsky.employeemanagement.dao.entity.Department;
 
 import java.util.List;
 import java.util.Set;
@@ -13,8 +12,41 @@ public class EmployeeWithDetailsDTO {
     private Gender gender;
     private int salary;
     private int age;
+    private String email;
     private Set<TitleDTO> titlesDtoSet;
     private List<DepartmentDTO> departmentsDtoList;
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public int getSalary() {
+        return salary;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public Set<TitleDTO> getTitlesDtoSet() {
+        return titlesDtoSet;
+    }
+
+    public List<DepartmentDTO> getDepartmentsDtoList() {
+        return departmentsDtoList;
+    }
 
     private EmployeeWithDetailsDTO(){
 
@@ -25,6 +57,7 @@ public class EmployeeWithDetailsDTO {
         private Gender gender;
         private int salary;
         private int age;
+        private String email;
         private Set<TitleDTO> titlesDtoSet;
         private List<DepartmentDTO> departmentsDtoList;
         public Builder firstName(String firstName){
@@ -51,6 +84,10 @@ public class EmployeeWithDetailsDTO {
             this.titlesDtoSet=titlesDtoSet;
             return this;
         }
+        public Builder email(String email){
+            this.email=email;
+            return this;
+        }
         public Builder departmentsDtoList(List<DepartmentDTO> departmentsDtoList){
             this.departmentsDtoList=departmentsDtoList;
             return this;
@@ -64,65 +101,11 @@ public class EmployeeWithDetailsDTO {
             employeeWithDetailsDTO.titlesDtoSet=this.titlesDtoSet;
             employeeWithDetailsDTO.gender=this.gender;
             employeeWithDetailsDTO.salary=this.salary;
+            employeeWithDetailsDTO.email=this.email;
             return employeeWithDetailsDTO;
         }
     }
 
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
-    public void setGender(Gender gender) {
-        this.gender = gender;
-    }
-
-    public int getSalary() {
-        return salary;
-    }
-
-    public void setSalary(int salary) {
-        this.salary = salary;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public Set<TitleDTO> getTitlesDtoList() {
-        return titlesDtoSet;
-    }
-
-    public void setTitlesDtoList(Set<TitleDTO> titlesDtoList) {
-        this.titlesDtoSet = titlesDtoSet;
-    }
-
-    public List<DepartmentDTO> getDepartmentsDtoList() {
-        return departmentsDtoList;
-    }
-
-    public void setDepartmentsDtoList(List<DepartmentDTO> departmentsDtoList) {
-        this.departmentsDtoList = departmentsDtoList;
-    }
     private EmployeeWithDetailsDTO(Builder b) {
         this.firstName = b.firstName;
         this.lastName=b.lastName;
@@ -131,6 +114,7 @@ public class EmployeeWithDetailsDTO {
         this.titlesDtoSet=b.titlesDtoSet;
         this.gender=b.gender;
         this.salary=b.salary;
+        this.email=b.email;
 
     }
 }
