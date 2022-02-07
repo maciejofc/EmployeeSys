@@ -23,7 +23,7 @@ public interface EmployeeRepository extends CrudRepository<Employee, Long> {
 
 
     @Query("select e from Employee e")
-    List<Employee> findAllEmployeesWithInfo();
+    List<Employee> findAllEmployeesWithInfo(Pageable page);
 
     @Modifying
     @Query(value =

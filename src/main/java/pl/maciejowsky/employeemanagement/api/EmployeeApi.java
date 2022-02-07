@@ -1,6 +1,7 @@
 package pl.maciejowsky.employeemanagement.api;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import pl.maciejowsky.employeemanagement.dao.entity.Title;
 import pl.maciejowsky.employeemanagement.dto.*;
 import pl.maciejowsky.employeemanagement.manager.EmployeeManager;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,26 +28,57 @@ public class EmployeeApi {
     private TitleMapper titleMapper;
     private EmployeeWithDetailsMapper mapperWithDetails;
     private EmployeeMapper mapper;
+    private EmployeeWithTitlesMapper mapperWithTitles;
 
     @Autowired
-    public EmployeeApi(EmployeeManager employeeManager, EmployeeWithDetailsMapper mapperWithDetails, EmployeeMapper mapper, TitleMapper titleMapper) {
+    public EmployeeApi(EmployeeManager employeeManager, EmployeeWithDetailsMapper mapperWithDetails,
+                       EmployeeMapper mapper, TitleMapper titleMapper,
+                       EmployeeWithTitlesMapper mapperWithTitles) {
         this.employeeManager = employeeManager;
         this.mapperWithDetails = mapperWithDetails;
         this.mapper = mapper;
         this.titleMapper = titleMapper;
+        this.mapperWithTitles = mapperWithTitles;
     }
 
 
-    @GetMapping("/all")
-    public ResponseEntity<List<EmployeeWithDetailsDTO>> getAllEmployees() {
-        int pageNumber = page >= 0 ? page : 0;
-        List<Employee> employees = employeeManager.findAllEmployeesWithInfo();
-        List<EmployeeWithDetailsDTO> employeeWithDetailsDTOS = employees.stream().map(e -> mapperWithDetails.toDto(e)).collect(Collectors.toList());
-        HttpHeaders header = new HttpHeaders();
-        header.add("Description", "List of all Employees");
-        //one method by using static method from ResponseEntity
-        return ResponseEntity.status(HttpStatus.OK).headers(header).body(employeeWithDetailsDTOS);
+    private Sort.Direction getSortDirection(String direction) {
+        if (direction.equals("asc")) {
+            return Sort.Direction.ASC;
+        } else if (direction.equals("desc")) {
+            return Sort.Direction.DESC;
+        }
+        return Sort.Direction.ASC;
+    }
 
+    @GetMapping("/all")
+    public ResponseEntity<List<EmployeeWithTitlesDTO>> getAllEmployees(@RequestParam(required = false) int page, @RequestParam(name="orders") List<String> sort) {
+        try {
+            List<Sort.Order> orders = new ArrayList<Sort.Order>();
+            if (sort.get(0).contains(",")) {
+                //will sort 2 or more than 2 columns
+                for (String sortOrder : sort) {
+                    // sortOrder = "column,direction"
+                    String[] _sort = sortOrder.split(",");
+                    orders.add(new Sort.Order(getSortDirection(_sort[1]), _sort[0]));
+                }
+            } else {
+                //sort = ["column","direction"]
+                orders.add(new Sort.Order(getSortDirection(sort.get(1)), sort.get(0)));
+            }
+            Sort definedSort = Sort.by(orders);
+
+            List<Employee> employees = employeeManager.findAllEmployeesWithInfo(page, definedSort);
+            List<EmployeeWithTitlesDTO> employeeWithTitlesDTOS = employees.stream().map(e -> mapperWithTitles.toDto(e)).collect(Collectors.toList());
+            HttpHeaders header = new HttpHeaders();
+            header.add("Description", "List of all sorted employees");
+            //one method by using static method from ResponseEntity
+
+            return ResponseEntity.status(HttpStatus.OK).headers(header).body(employeeWithTitlesDTOS);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping()

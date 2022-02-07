@@ -84,7 +84,7 @@ public class Employee {
     //updatable true and insertable
     // by default makes we can pass titles into request body
     //when we insert or update
-    @JoinColumn(name = "emp_no_foreign_key", referencedColumnName = "emp_no", insertable = true, updatable = true)
+    @JoinColumn(name = "employeeId", referencedColumnName = "emp_no", insertable = true, updatable = true)
     private Set<Title> titles = new HashSet<>();
     //
 
@@ -205,5 +205,6 @@ public class Employee {
         this.salary = salary;
         this.hireDate = Date.valueOf(LocalDate.now());
     }
+
 
 }

@@ -20,6 +20,7 @@ public class Title {
     )
     private String title;
 
+    private Long employeeId;
     public Title() {
     }
 
@@ -45,5 +46,7 @@ public class Title {
 
     }
 
-
+    public Long getEmployeeId() {
+        return employeeId;
+    }
 }
