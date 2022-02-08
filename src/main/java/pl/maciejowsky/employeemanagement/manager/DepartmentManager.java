@@ -15,16 +15,17 @@ public class DepartmentManager {
     @Autowired
     private DepartmentRepository departmentRepository;
 
-    public List<Department> findAll() {
+    public List<Department> findAllDepartmentsWithEmployee() {
         return departmentRepository.findAllDepartmentsWithEmployee();
     }
 
-    public Department findById(Long id) {
+    public Department findDepartmentById(Long id) {
         return departmentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No department with id: " + id));
     }
 
-    public Department findByName(String name) {
-        return departmentRepository.findByName(name);
+    public Department findDepartmentByName(String name) {
+        return departmentRepository.findDepartmentByName(name)
+                .orElseThrow(() -> new ResourceNotFoundException("There is no department with this name"));
     }
 
     @Transactional
@@ -54,7 +55,7 @@ public class DepartmentManager {
 
     @Transactional
     public Department editDepartment(Department department, Long id) {
-        Department departmentFromDB = findById(id);
+        Department departmentFromDB = findDepartmentById(id);
         String newPossibleName = department.getName();
         String newPossibleLocation = department.getLocation();
         if (newPossibleName != null) {

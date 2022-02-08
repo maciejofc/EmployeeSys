@@ -1,6 +1,5 @@
 package pl.maciejowsky.employeemanagement.dao.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import pl.maciejowsky.employeemanagement.dao.Gender;
 
 import javax.persistence.*;
@@ -76,22 +75,23 @@ public class Employee {
 //    ManyToMany: LAZY
 //    OneToOne: EAGER
     //orphan removal(ORM concept) make a DELETE statement to child when
-    //there is no longer association
+    //there is no longer association so there can be no delete just changing
 
     //CascadeType.Remove(db concept) if parent is removed all related records in child
     //table should be removed
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = false)
+    @OneToMany(cascade = CascadeType.REMOVE)
     //updatable true and insertable
     // by default makes we can pass titles into request body
     //when we insert or update
-    @JoinColumn(name = "employeeId", referencedColumnName = "emp_no", insertable = true, updatable = true)
+    @JoinColumn(name = "employeeeId", referencedColumnName = "emp_no")
     private Set<Title> titles = new HashSet<>();
-    //
+
 
     @ManyToMany()
     @JoinTable(
             joinColumns = {@JoinColumn(name = "emp_no")},
             inverseJoinColumns = {@JoinColumn(name = "dept_no")}
+            //inverseJoinColumns anno because dept_no is in inverse side of RELATIONSHIP
     )
 
     List<Department> departments = new ArrayList<>();

@@ -6,10 +6,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.maciejowsky.employeemanagement.dao.entity.Department;
-import pl.maciejowsky.employeemanagement.dao.exception.ResourceNotFoundException;
 import pl.maciejowsky.employeemanagement.dto.*;
 import pl.maciejowsky.employeemanagement.manager.DepartmentManager;
 
+import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,7 +35,7 @@ public class DepartmentApi {
 
     @GetMapping("/all")
     public ResponseEntity<List<DepartmentWithEmployeesDTO>> getAllDepartments() {
-        List<Department> departments = departmentManager.findAll();
+        List<Department> departments = departmentManager.findAllDepartmentsWithEmployee();
         List<DepartmentWithEmployeesDTO> departmentWithEmployeesDTOS = departments.stream().map(e -> departmentWithEmployeesMapper.toDto(e)).collect(Collectors.toList());
         HttpHeaders header = new HttpHeaders();
         header.add("Description", "List of all Departments");
@@ -44,7 +44,7 @@ public class DepartmentApi {
 
     @GetMapping("/{id}")
     public ResponseEntity<DepartmentWithEmployeesDTO> getDepartmentById(@PathVariable Long id) {
-        Department department = departmentManager.findById(id);
+        Department department = departmentManager.findDepartmentById(id);
         DepartmentWithEmployeesDTO departmentWithEmployeesDTO = departmentWithEmployeesMapper.toDto(department);
         HttpHeaders header = new HttpHeaders();
         header.add("Description", "Single department");
@@ -53,7 +53,7 @@ public class DepartmentApi {
 
     @GetMapping()
     public ResponseEntity<DepartmentWithEmployeesDTO> getDepartmentByName(@RequestParam String name) {
-        Department department = departmentManager.findByName(name);
+        Department department = departmentManager.findDepartmentByName(name);
         DepartmentWithEmployeesDTO departmentWithEmployeesDTO = departmentWithEmployeesMapper.toDto(department);
         HttpHeaders header = new HttpHeaders();
         header.add("Description", "Single department");
@@ -61,29 +61,32 @@ public class DepartmentApi {
     }
 
     @PostMapping
-    public ResponseEntity<Void> addDepartment(@RequestBody DepartmentDTO departmentDTO) {
+    public ResponseEntity<DepartmentDTO> addDepartment(@RequestBody DepartmentDTO departmentDTO) {
         Department department = departmentMapper.toModel(departmentDTO);
         departmentManager.saveDepartment(department);
         HttpHeaders header = new HttpHeaders();
-        header.add("Description", "Adding one department");
-        return ResponseEntity.status(HttpStatus.OK).headers(header).build();
+        String uriLocation= "/api/departments/"+department.getId();
+        header.setLocation(URI.create(uriLocation));
+        header.add("Description", "Added one department");
+        return ResponseEntity.status(HttpStatus.CREATED).headers(header).build();
     }
 
     @PostMapping("/{id}/employees")
     public ResponseEntity<Void> addEmployeeToDepartment(@RequestParam Long employeeId, @PathVariable Long id) {
         departmentManager.saveEmployeeToDepartment(employeeId, id);
         HttpHeaders header = new HttpHeaders();
-        header.add("Description", "Adding one department");
+        header.add("Description", "Aded one employee to department");
         return ResponseEntity.status(HttpStatus.OK).headers(header).build();
     }
-    @PutMapping("/{id}")
-    public ResponseEntity<Department> updateDepartment(@RequestBody DepartmentDTO departmentDTO,Long id){
 
-      Department editedDepartment =departmentMapper.toModel(departmentDTO);
-        departmentManager.editDepartment(editedDepartment,id);
+    @PutMapping("/{id}")
+    public ResponseEntity<DepartmentDTO> updateDepartment(@RequestBody DepartmentDTO departmentDTO, Long id) {
+
+        Department editedDepartment = departmentMapper.toModel(departmentDTO);
+        departmentManager.editDepartment(editedDepartment, id);
         HttpHeaders header = new HttpHeaders();
-        header.add("Description", "Updating department");
-        return ResponseEntity.status(HttpStatus.OK).headers(header).build();
+        header.add("Description", "Updated department");
+        return ResponseEntity.status(HttpStatus.OK).headers(header).body(departmentDTO);
 
     }
 
@@ -91,8 +94,8 @@ public class DepartmentApi {
     public ResponseEntity<Void> deleteDepartment(@PathVariable Long id) {
         departmentManager.deleteDepartment(id);
         HttpHeaders header = new HttpHeaders();
-        header.add("Description", "Deleting one department");
-        return ResponseEntity.status(HttpStatus.OK).headers(header).build();
+        header.add("Description", "Deleted one department");
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).headers(header).build();
     }
 
 
@@ -100,8 +103,8 @@ public class DepartmentApi {
     public ResponseEntity<Void> deleteEmployeeFromDepartment(@PathVariable Long employeeId, @PathVariable Long id) {
         departmentManager.deleteEmployeeFromDepartment(employeeId, id);
         HttpHeaders header = new HttpHeaders();
-        header.add("Description", "Deleting employee from department");
-        return ResponseEntity.status(HttpStatus.OK).headers(header).build();
+        header.add("Description", "Deleted employee from department");
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).headers(header).build();
     }
 
 

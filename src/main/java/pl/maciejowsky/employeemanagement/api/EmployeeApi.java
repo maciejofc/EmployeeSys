@@ -11,6 +11,7 @@ import pl.maciejowsky.employeemanagement.dao.entity.Title;
 import pl.maciejowsky.employeemanagement.dto.*;
 import pl.maciejowsky.employeemanagement.manager.EmployeeManager;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -52,22 +53,9 @@ public class EmployeeApi {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<EmployeeWithTitlesDTO>> getAllEmployees(@RequestParam(required = false) int page, @RequestParam(name="orders") List<String> sort) {
-        try {
-            List<Sort.Order> orders = new ArrayList<Sort.Order>();
-            if (sort.get(0).contains(",")) {
-                //will sort 2 or more than 2 columns
-                for (String sortOrder : sort) {
-                    // sortOrder = "column,direction"
-                    String[] _sort = sortOrder.split(",");
-                    orders.add(new Sort.Order(getSortDirection(_sort[1]), _sort[0]));
-                }
-            } else {
-                //sort = ["column","direction"]
-                orders.add(new Sort.Order(getSortDirection(sort.get(1)), sort.get(0)));
-            }
-            Sort definedSort = Sort.by(orders);
-
+    public ResponseEntity<List<EmployeeWithTitlesDTO>> getAllEmployees(@RequestParam(required = false) int page, @RequestParam(name = "orders", required = false) List<String> sort) {
+        if (sort == null) {
+            Sort definedSort = Sort.by("id");
             List<Employee> employees = employeeManager.findAllEmployeesWithInfo(page, definedSort);
             List<EmployeeWithTitlesDTO> employeeWithTitlesDTOS = employees.stream().map(e -> mapperWithTitles.toDto(e)).collect(Collectors.toList());
             HttpHeaders header = new HttpHeaders();
@@ -75,10 +63,37 @@ public class EmployeeApi {
             //one method by using static method from ResponseEntity
 
             return ResponseEntity.status(HttpStatus.OK).headers(header).body(employeeWithTitlesDTOS);
+        } else {
+            try {
+                List<Sort.Order> orders = new ArrayList<Sort.Order>();
 
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+                if (sort.get(0).contains(",")) {
+                    //will sort 2 or more than 2 columns
+                    for (String sortOrder : sort) {
+                        // sortOrder = "column,direction"
+                        String[] _sort = sortOrder.split(",");
+                        orders.add(new Sort.Order(getSortDirection(_sort[1]), _sort[0]));
+                    }
+                } else {
+                    //sort = ["column","direction"]
+                    orders.add(new Sort.Order(getSortDirection(sort.get(1)), sort.get(0)));
+                }
+                Sort definedSort = Sort.by(orders);
+
+                List<Employee> employees = employeeManager.findAllEmployeesWithInfo(page, definedSort);
+                List<EmployeeWithTitlesDTO> employeeWithTitlesDTOS = employees.stream().map(e -> mapperWithTitles.toDto(e)).collect(Collectors.toList());
+                HttpHeaders header = new HttpHeaders();
+                header.add("Description", "List of all sorted employees");
+                //one method by using static method from ResponseEntity
+
+                return ResponseEntity.status(HttpStatus.OK).headers(header).body(employeeWithTitlesDTOS);
+
+            } catch (Exception e) {
+                return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         }
+
+
     }
 
     @GetMapping()
@@ -107,25 +122,31 @@ public class EmployeeApi {
     @PostMapping
     //post adding elements
     //request body maps the HttpRequestBody to domain object, JSON -> Java type
-    public ResponseEntity<Void> addEmployee(@RequestBody EmployeeDTO employeeDTO) {
+    public ResponseEntity<EmployeeDTO> addEmployee(@RequestBody EmployeeDTO employeeDTO) {
 //        Employee employee = new Employee();
+
         Employee employee = mapper.toModel(employeeDTO);
+
         employeeManager.saveEmployee(employee);
+        String uriLocation = "/api/employees/"+employee.getId();
         HttpHeaders header = new HttpHeaders();
-        header.add("Description", "Adding one employee");
-        return ResponseEntity.status(HttpStatus.OK).headers(header).build();
+        header.setLocation(URI.create(uriLocation));
+        header.add("Description", "Added one employee");
+        return ResponseEntity.status(HttpStatus.CREATED).headers(header).body(employeeDTO);
         // or without header and body
         // return ResponseEntity.ok().build();
     }
 
 
     @PostMapping("/{id}/titles")
-    public ResponseEntity<Void> addTitle(@RequestBody TitleDTO titleDTO, @PathVariable Long id) {
+    public ResponseEntity<TitleDTO> addTitle(@RequestBody TitleDTO titleDTO, @PathVariable Long id) {
         Title title = titleMapper.toModel(titleDTO);
         employeeManager.addTitle(title, id);
+        String uriLocation = "/api/employees/id/titles/"+title.getId();
         HttpHeaders header = new HttpHeaders();
-        header.add("Description", "Adding title to employee");
-        return ResponseEntity.status(HttpStatus.OK).headers(header).build();
+        header.setLocation(URI.create(uriLocation));
+        header.add("Description", "Added title to employee");
+        return ResponseEntity.status(HttpStatus.CREATED).headers(header).build();
     }
 
     @PutMapping("/{id}")
@@ -133,7 +154,7 @@ public class EmployeeApi {
         Employee employeeEdited = mapper.toModel(employeeDTO);
         employeeManager.editEmployee(employeeEdited, id);
         HttpHeaders header = new HttpHeaders();
-        header.add("Description", "Updating employee");
+        header.add("Description", "Updated employee");
         return ResponseEntity.status(HttpStatus.OK).headers(header).body(employeeDTO);
     }
 
@@ -142,14 +163,16 @@ public class EmployeeApi {
     public ResponseEntity<Void> deleteTitle(@PathVariable Long id, @RequestParam Long titleId) {
         employeeManager.deleteTitle(titleId);
         HttpHeaders header = new HttpHeaders();
-        header.add("Description", "Delete title from employee");
-        return ResponseEntity.status(HttpStatus.OK).headers(header).build();
+        header.add("Description", "Deleted title from employee");
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).headers(header).build();
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
         employeeManager.deleteById(id);
-        return ResponseEntity.ok().build();
+        HttpHeaders header = new HttpHeaders();
+        header.add("Description", "Deleted employee");
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).headers(header).build();
 
     }
 

@@ -21,6 +21,7 @@ public class Title {
     private String title;
 
     private Long employeeId;
+
     public Title() {
     }
 

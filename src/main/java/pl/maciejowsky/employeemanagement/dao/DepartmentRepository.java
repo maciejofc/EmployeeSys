@@ -8,14 +8,17 @@ import org.springframework.stereotype.Repository;
 import pl.maciejowsky.employeemanagement.dao.entity.Department;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface DepartmentRepository extends CrudRepository<Department, Long> {
-    @Query("select d from Department d")
+    @Query("select d from Department d " +
+            "left join fetch d.employees")
     List<Department> findAllDepartmentsWithEmployee();
 
-    @Query("select d from Department d where d.name=:departmentName")
-    Department findByName(@Param("departmentName") String name);
+    @Query("select d from Department d " +
+            "left join fetch d.employees where d.name=:departmentName")
+    Optional<Department> findDepartmentByName(@Param("departmentName") String name);
 
     @Modifying
     @Query(value = "insert into employees_departments (emp_no, dept_no) values (:employeeId, :departmentId)",

@@ -71,7 +71,7 @@ public class EmployeeManager {
     }
 
     public Employee findEmployeeAndInfoById(Long id) {
-        return employeeRepository.findById(id).orElseThrow(() ->
+        return employeeRepository.findEmployeeAndInfoById(id).orElseThrow(() ->
                 new ResourceNotFoundException("There is no member associated with this id: " + id));
     }
 
@@ -146,32 +146,45 @@ public class EmployeeManager {
         Employee employee1 = new Employee(new Date(1983, 10, 12), "Robert", "Nosalik", "nosek10@gmail.com", Gender.MALE, 4000);
         entityManager.persist(employee1);
         Employee employee2 = new Employee(new Date(1985, 11, 12), "Robert", "Nosalik", "nosek9@gmail.com", Gender.FEMALE, 30030);
-        Employee employee3 = new Employee(new Date(1925, 11, 12), "Maciek", "Nosalik", "nosek8@gmail.com", Gender.FEMALE, 31000);
-        Employee employee4 = new Employee(new Date(1924, 11, 12), "Tosia", "Nosalik", "nosek6@gmail.com", Gender.FEMALE, 30040);
-
-        employee1.getTitles().add(new Title("JUNIOR"));
-        employee1.getTitles().add(new Title("MANAGER"));
-        employee1.getTitles().add(new Title("CEO"));
-
-
-        employee2.getTitles().add(new Title("JUNIOR"));
-        employee2.getTitles().add(new Title("NOONE"));
         entityManager.persist(employee2);
-        employee3.getTitles().add(new Title("A ONE"));
+
+        Employee employee3 = new Employee(new Date(1925, 11, 12), "Maciek", "Nosalik", "nosek8@gmail.com", Gender.FEMALE, 31000);
         entityManager.persist(employee3);
+        Employee employee4 = new Employee(new Date(1924, 11, 12), "Tosia", "Nosalik", "nosek6@gmail.com", Gender.FEMALE, 30040);
         entityManager.persist(employee4);
+        Title title = new Title("JUNIOR");
+        Title title1 = new Title("MANAGER");
+        Title title2 = new Title("CEO");
+        Title title3 = new Title("NO ONE");
+        Title title4 = new Title("A ONE");
+        entityManager.persist(title);
+        entityManager.persist(title1);
+        entityManager.persist(title2);
+        entityManager.persist(title3);
+        entityManager.persist(title4);
+        employee1.getTitles().add(title);
+        employee1.getTitles().add(title1);
+        employee1.getTitles().add(title2);
+
+
+        employee2.getTitles().add(title3);
+        employee2.getTitles().add(title4);
+
+        employee3.getTitles().add(title);
+
+
         Department department = new Department("Department 1", "Gdynia");
         Department department2 = new Department("Department 2", "Warszawa");
         Department department3 = new Department("Department 3", "Sopot");
-
+        entityManager.persist(department);
+        entityManager.persist(department2);
+        entityManager.persist(department3);
 
         employee2.addDepartment(department2);
         employee2.addDepartment(department3);
         employee1.addDepartment(department);
         employee4.addDepartment(department);
         employee3.addDepartment(department2);
-        entityManager.persist(department);
-        entityManager.persist(department2);
-        entityManager.persist(department3);
+
     }
 }

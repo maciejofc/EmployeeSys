@@ -2,6 +2,8 @@ package pl.maciejowsky.employeemanagement.dao.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -18,9 +20,10 @@ public class Department {
     private Long id;
 
     private String name;
-    //
+
 
     @ManyToMany(mappedBy = "departments")
+    @Fetch(FetchMode.JOIN)
     private List<Employee> employees = new ArrayList<>();
 
     private String location;

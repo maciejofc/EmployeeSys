@@ -8,7 +8,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import pl.maciejowsky.employeemanagement.dao.entity.Employee;
 
-
 import java.util.List;
 import java.util.Optional;
 
@@ -17,9 +16,10 @@ public interface EmployeeRepository extends CrudRepository<Employee, Long> {
 //All the methods of CrudRepository are annotated with @Transactional
 // in implementation class by default at runtime
 
-    @Query("SELECT e FROM Employee e left join" +
-            " fetch e.titles WHERE e.email = ?1")
-     Optional<Employee> findEmployeeAndInfoByEmail(String email);
+    @Query("SELECT e FROM Employee e " +
+            "left join fetch e.titles t" +
+            " left join fetch e.departments WHERE e.email = ?1")
+    Optional<Employee> findEmployeeAndInfoByEmail(String email);
 
 
     @Query("select e from Employee e")
@@ -35,8 +35,12 @@ public interface EmployeeRepository extends CrudRepository<Employee, Long> {
     @Query(value =
             "delete from titles where title_no=:title_no"
             , nativeQuery = true)
+        //SOMETHING TO DO!!!!!!!
     void deleteTitle(@Param("title_no") Long empNo);
-    @Query("select e from Employee e where e.id = ?1")
+
+    @Query("select e from Employee e" +
+            " left join fetch e.titles t " +
+            " left join fetch e.departments d where e.id = ?1")
     Optional<Employee> findEmployeeAndInfoById(Long id);
 
 
