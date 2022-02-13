@@ -99,7 +99,7 @@ public class EmployeeApi {
     @GetMapping()
     public ResponseEntity<EmployeeWithDetailsDTO> getEmployeeByEmail(@RequestParam(required = true) String email) {
         Employee employee = employeeManager.findEmployeeAndInfoByEmail(email);
-        System.out.println(employee);
+
         EmployeeWithDetailsDTO employeeWithDetailsDTO = mapperWithDetails.toDto(employee);
         HttpHeaders header = new HttpHeaders();
         header.add("Description", "Result of single employee");
@@ -174,6 +174,13 @@ public class EmployeeApi {
         header.add("Description", "Deleted employee");
         return ResponseEntity.status(HttpStatus.NO_CONTENT).headers(header).build();
 
+    }
+    @DeleteMapping()
+    public ResponseEntity<Void> deleteAllEmployees(){
+        employeeManager.deleteAllEmployees();
+        HttpHeaders header= new HttpHeaders();
+        header.add("Description","Deleted employees");
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).headers(header).build();
     }
 
 }

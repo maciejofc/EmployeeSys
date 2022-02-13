@@ -36,6 +36,7 @@ public class EmployeeManager {
     private TitleRepository titleRepository;
     private EmployeeRepository employeeRepository;
 
+
     @Autowired
     public EmployeeManager(EmployeeRepository employeeRepository,
                            TitleRepository titleRepository) {
@@ -129,8 +130,8 @@ public class EmployeeManager {
                 throw new ResourceAlreadyExistsException("This title: " + nameOfAlreadyExistingTitle + " is already assigned to member");
             }
         }
+        employeeRepository.addTitle(title.getTitle(),empNo);
 
-        employee.getTitles().add(title);
     }
 
 
@@ -138,7 +139,10 @@ public class EmployeeManager {
     public void deleteTitle(Long id) {
         employeeRepository.deleteTitle(id);
     }
-
+    @Transactional
+    public void deleteAllEmployees(){
+        employeeRepository.deleteAll();
+    }
 
     @Transactional
     @EventListener(ApplicationReadyEvent.class)
@@ -157,28 +161,16 @@ public class EmployeeManager {
         Title title2 = new Title("CEO");
         Title title3 = new Title("NO ONE");
         Title title4 = new Title("A ONE");
-        entityManager.persist(title);
-        entityManager.persist(title1);
-        entityManager.persist(title2);
-        entityManager.persist(title3);
-        entityManager.persist(title4);
-        employee1.getTitles().add(title);
-        employee1.getTitles().add(title1);
-        employee1.getTitles().add(title2);
-
-
-        employee2.getTitles().add(title3);
-        employee2.getTitles().add(title4);
-
-        employee3.getTitles().add(title);
+        employee1.setTitles(Set.of(title,title1));
+        employee2.addTitle(title2);
+        employee3.addTitle(title3);
+        employee4.addTitle(title4);
 
 
         Department department = new Department("Department 1", "Gdynia");
         Department department2 = new Department("Department 2", "Warszawa");
         Department department3 = new Department("Department 3", "Sopot");
-        entityManager.persist(department);
-        entityManager.persist(department2);
-        entityManager.persist(department3);
+
 
         employee2.addDepartment(department2);
         employee2.addDepartment(department3);

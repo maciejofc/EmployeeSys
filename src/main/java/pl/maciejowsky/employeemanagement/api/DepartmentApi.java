@@ -60,7 +60,7 @@ public class DepartmentApi {
         return ResponseEntity.status(HttpStatus.OK).headers(header).body(departmentWithEmployeesDTO);
     }
 
-    @PostMapping
+    @PostMapping("/")
     public ResponseEntity<DepartmentDTO> addDepartment(@RequestBody DepartmentDTO departmentDTO) {
         Department department = departmentMapper.toModel(departmentDTO);
         departmentManager.saveDepartment(department);
@@ -71,12 +71,14 @@ public class DepartmentApi {
         return ResponseEntity.status(HttpStatus.CREATED).headers(header).build();
     }
 
-    @PostMapping("/{id}/employees")
-    public ResponseEntity<Void> addEmployeeToDepartment(@RequestParam Long employeeId, @PathVariable Long id) {
+    @PutMapping("/{id}/employees/{employeeId}")
+    public ResponseEntity<Void> addEmployeeToDepartment(@RequestParam Long employeeId, @RequestParam Long id) {
         departmentManager.saveEmployeeToDepartment(employeeId, id);
         HttpHeaders header = new HttpHeaders();
-        header.add("Description", "Aded one employee to department");
-        return ResponseEntity.status(HttpStatus.OK).headers(header).build();
+        String uriLocation = "/api/employees/"+employeeId;
+        header.setLocation(URI.create(uriLocation));
+        header.add("Description", "Added one employee to department");
+        return ResponseEntity.status(HttpStatus.CREATED).headers(header).build();
     }
 
     @PutMapping("/{id}")

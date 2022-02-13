@@ -22,8 +22,7 @@ public class Employee {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(
-            name = "emp_no",
-            updatable = false
+            name = "emp_no"
     )
     private Long id;
 
@@ -79,15 +78,15 @@ public class Employee {
 
     //CascadeType.Remove(db concept) if parent is removed all related records in child
     //table should be removed
-    @OneToMany(cascade = CascadeType.REMOVE)
+    @OneToMany(cascade = {CascadeType.REMOVE,CascadeType.PERSIST})
     //updatable true and insertable
     // by default makes we can pass titles into request body
     //when we insert or update
-    @JoinColumn(name = "employeeeId", referencedColumnName = "emp_no")
+    @JoinColumn(name = "employeeId", referencedColumnName = "emp_no")
     private Set<Title> titles = new HashSet<>();
 
 
-    @ManyToMany()
+    @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(
             joinColumns = {@JoinColumn(name = "emp_no")},
             inverseJoinColumns = {@JoinColumn(name = "dept_no")}
@@ -98,9 +97,12 @@ public class Employee {
 
     public void addDepartment(Department department) {
         departments.add(department);
+
         department.getEmployees().add(this);
     }
-
+    public void addTitle(Title title){
+        titles.add(title);
+    }
     public Date getBirthDate() {
 
         return birthDate;
@@ -173,7 +175,7 @@ public class Employee {
 
     public Set<Title> getTitles() {
 
-        return titles;
+        return this.titles;
     }
 
 
@@ -205,6 +207,7 @@ public class Employee {
         this.salary = salary;
         this.hireDate = Date.valueOf(LocalDate.now());
     }
+
 
 
 }

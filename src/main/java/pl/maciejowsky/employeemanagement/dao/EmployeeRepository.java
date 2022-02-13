@@ -13,35 +13,34 @@ import java.util.Optional;
 
 @Repository
 public interface EmployeeRepository extends CrudRepository<Employee, Long> {
-//All the methods of CrudRepository are annotated with @Transactional
+    //All the methods of CrudRepository are annotated with @Transactional
 // in implementation class by default at runtime
-
-    @Query("SELECT e FROM Employee e " +
-            "left join fetch e.titles t" +
-            " left join fetch e.departments WHERE e.email = ?1")
-    Optional<Employee> findEmployeeAndInfoByEmail(String email);
-
-
     @Query("select e from Employee e")
     List<Employee> findAllEmployeesWithInfo(Pageable page);
 
+    @Query("select e from Employee e " +
+            "left join fetch e.titles t" +
+            " left join fetch e.departments where e.email = ?1")
+    Optional<Employee> findEmployeeAndInfoByEmail(String email);
+
+    @Query("select e from Employee e" +
+            " left join fetch e.titles t " +
+            " left join fetch e.departments where e.id = ?1")
+    Optional<Employee> findEmployeeAndInfoById(Long id);
+
     @Modifying
     @Query(value =
-            "insert into titles (name, emp_no_foreign_key) values (:name, :emp_no_foreign_key)"
+            "insert into titles (name, employee_id) values (:name, :employee_id)"
             , nativeQuery = true)
-    void addTitle(@Param("name") String titleName, @Param("emp_no_foreign_key") Long empNo);
+    void addTitle(@Param("name") String titleName, @Param("employee_id") Long empNo);
 
     @Modifying
     @Query(value =
             "delete from titles where title_no=:title_no"
             , nativeQuery = true)
         //SOMETHING TO DO!!!!!!!
-    void deleteTitle(@Param("title_no") Long empNo);
+    void deleteTitle(@Param("title_no") Long titleNo);
 
-    @Query("select e from Employee e" +
-            " left join fetch e.titles t " +
-            " left join fetch e.departments d where e.id = ?1")
-    Optional<Employee> findEmployeeAndInfoById(Long id);
 
 
 }
